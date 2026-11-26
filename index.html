@@ -85,6 +85,18 @@ h1{font-size:clamp(30px,6vw,46px)}
 .close{border:0;border-top:2px dashed var(--line);background:light-dark(#fde2d8,#3a2019);color:light-dark(#a3261a,#ff9a85);font:700 13px "Noto Sans KR",sans-serif;min-height:38px;cursor:pointer;text-align:left;padding:6px 12px}
 .close[hidden]{display:none}
 .locked{display:none!important}
+#fab{display:none;position:fixed;left:14px;bottom:18px;z-index:6;width:84px;height:84px;border:0;padding:0;background:none;border-radius:50%;touch-action:manipulation;filter:drop-shadow(0 6px 10px #0008)}
+#fab svg{width:84px;height:84px}
+#fab span{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:var(--ink);color:var(--bg);font:900 12px "Noto Sans KR",sans-serif;border-radius:999px;padding:1px 8px;white-space:nowrap}
+#fab:active{transform:scale(.92)}
+@media(max-width:600px){#fab.on{display:block}.wrap{padding-bottom:110px}}
+.book{display:grid;gap:8px;margin-top:6px}
+.book h3{margin:14px 0 2px;font-size:16px}
+.bk{background:var(--card);border-radius:10px;padding:10px 12px}
+.bk .by{font-family:"Black Han Sans",sans-serif;color:var(--red);font-size:18px;margin-right:8px}
+.bk b{font-size:15px}
+.bk p{margin:4px 0 0;font-size:14px;color:var(--mute)}
+.bk.off{opacity:.5}
 #toast{position:fixed;left:50%;bottom:16px;transform:translate(-50%,150%);width:min(520px,calc(100% - 24px));background:var(--ink);color:var(--bg);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px #0006;transition:transform .35s;z-index:5;cursor:pointer}
 #toast.show{transform:translate(-50%,0)}
 #toast .k{display:flex;align-items:baseline;gap:10px;font-size:14px;font-weight:700;opacity:.85}
@@ -117,6 +129,7 @@ blockquote small{display:block;color:var(--mute);margin-top:4px}
     <div><h1>Energy Clicker</h1><div class="sub">나주 에너지과학관 · 불씨 하나로 AI 시대까지</div></div>
     <div class="tools">
       <button class="btn" id="help">방법</button>
+      <button class="btn" id="book">카드 <span id="bookN">0</span></button>
       <button class="btn" id="speed" title="발표자용 빨리감기">속도 ×1</button>
       <button class="btn main" id="finish">결과</button>
     </div>
@@ -170,6 +183,7 @@ blockquote small{display:block;color:var(--mute);margin-top:4px}
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
+<button id="fab" aria-label="불씨 누르기"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="92" fill="#ff9a1f" stroke="#17140f" stroke-width="8"/><path d="M100 44c18 26 34 38 34 64a34 34 0 0 1-68 0c0-14 8-22 14-30 2 12 8 18 14 18-6-18 0-36 6-52z" fill="#fff"/></svg><span id="fabN"></span></button>
 <div class="modal" id="modal" role="dialog" aria-modal="true"><div class="panel" id="panel"></div></div>
 
 <script>
@@ -272,7 +286,8 @@ function renderShop(){
 function buy(b){if(b.ch>S.ch)return;const c=cost(b);if(S.work<c)return;S.work-=c;S.own[b.id]++;card(b);tick(0);}
 function sell(b){if(!S.own[b.id]||S.ch<3)return;S.own[b.id]--;S.work+=Math.floor(cost(b)*.5);tick(0);}
 function buyUp(u){if(S.ups[u.id]||S.work<u.cost)return;S.work-=u.cost;S.ups[u.id]=1;if(!S.snap)S.snap={use:use(),t:S.t};S.marks.push(S.hist.length);card(u);tick(0);}
-function card(x){if(S.seen[x.id])return;S.seen[x.id]=1;S.log.push({y:x.y,ct:x.ct});$('cards').textContent=S.log.length;show(x.y,x.n,x.ct,x.cx);}
+const setCount=()=>{$('cards').textContent=S.log.length;$('bookN').textContent=S.log.length;};
+function card(x){if(S.seen[x.id])return;S.seen[x.id]=1;S.log.push({y:x.y,ct:x.ct});setCount();show(x.y,x.n,x.ct,x.cx);}
 let tt=null;
 function show(y,k,t,p){const el=$('toast');el.innerHTML=`<div class="k"><span class="y">${y}</span><span>${k}</span></div><div class="t">${t}</div><p>${p}</p>`;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),innerWidth<600?5000:7000);}
 $('toast').onclick=()=>{clearTimeout(tt);$('toast').classList.remove('show');};
@@ -299,7 +314,7 @@ function tick(dt){
  $('work').textContent=fmt(S.work);$('wps').textContent=fmt(w);$('use').textContent=fmt(use());
  const t=temp();$('temp').textContent='+'+t.toFixed(2)+'°C';$('tbar').style.width=Math.min(100,t/2.5*100)+'%';
  $('pen').textContent=t>=2?'· 폭염: 생산 −40%':t>=1.5?'· 이상기후: 생산 −20%':'';
- $('perclick').textContent=fmt(perClick());{const c=combo();$('combo').textContent=c>1.05?`연타 ×${c.toFixed(1)}`:'빠르게 연타하면 최대 ×2.5';$('combo').classList.toggle('hot',c>1.05);$('orb').style.filter=c>1.05?`brightness(${1+(c-1)*.25}) saturate(${1+(c-1)*.3})`:'';}$('era').textContent=eraName();
+ $('perclick').textContent=fmt(perClick());$('fabN').textContent='+'+fmt(perClick());{const c=combo();$('combo').textContent=c>1.05?`연타 ×${c.toFixed(1)}`:'빠르게 연타하면 최대 ×2.5';$('combo').classList.toggle('hot',c>1.05);$('orb').style.filter=c>1.05?`brightness(${1+(c-1)*.25}) saturate(${1+(c-1)*.3})`:'';}$('era').textContent=eraName();
  $('clock').textContent=mmss(S.ch>3?S.winT:S.t);
  B.forEach(b=>{const wr=$('w-'+b.id),c=cost(b);const open=b.ch<=S.ch&&(S.work>=b.cost*.4||S.own[b.id]||b.id==='w');if(open||S.own[b.id])wr.classList.remove('locked');
   $('b-'+b.id).disabled=S.work<c||b.ch>S.ch;
@@ -326,7 +341,7 @@ function spawnVisit(){const v=$('visit'),st=$('stage');const s=SCI[sciI++%SCI.le
  v.style.left=(10+Math.random()*Math.max(10,st.clientWidth-200))+'px';v.style.top=(10+Math.random()*Math.max(10,st.clientHeight-80))+'px';visitLeft=9;}
 $('visit').onclick=()=>{const s=SCI[+$('visit').dataset.i];$('visit').style.display='none';visitLeft=0;
  let bonus;if(Math.random()<.5){const g=wps()*30+perClick()*40;S.work+=g;bonus=`일 +${fmt(g)}`;}else{boostT=20;boostX=5;bonus='20초 동안 생산 ×5';}
- const id='sci-'+s.n;if(!S.seen[id]){S.seen[id]=1;S.log.push({y:s.y,ct:s.n});$('cards').textContent=S.log.length;}
+ const id='sci-'+s.n;if(!S.seen[id]){S.seen[id]=1;S.log.push({y:s.y,ct:s.n});setCount();}
  show(s.y,`${s.n} 방문`,bonus,s.x);tick(0);};
 
 /* 그래프 */
@@ -385,7 +400,18 @@ function howto(){
  $('modal').classList.add('show');$('close').onclick=()=>$('modal').classList.remove('show');
 }
 $('help').onclick=howto;
-renderShop();$('cards').textContent=S.log.length;tick(0);
+function book(){
+ const sec=(title,list)=>`<h3>${title}</h3>`+list.map(c=>c.got?`<div class="bk"><span class="by">${c.y}</span><b>${c.n}</b> <span class="d">${c.t}</span><p>${c.x}</p></div>`:`<div class="bk off"><span class="by">?</span><b>아직 못 모은 카드</b><p>${c.h}</p></div>`).join('');
+ const bs=B.map(b=>({got:S.seen[b.id],y:b.y,n:b.n,t:b.ct,x:b.cx,h:b.ch>S.ch?`임무 ${b.ch}에서 열리는 건물`:'아직 안 지은 건물'}));
+ const us=U.map(u=>({got:S.seen[u.id],y:u.y,n:u.n,t:u.ct,x:u.cx,h:'아직 안 산 업그레이드'}));
+ const ss=SCI.map(c=>({got:S.seen['sci-'+c.n],y:c.y,n:c.n,t:'과학자 방문',x:c.x,h:'화면에 나타나는 과학자를 눌러 보세요'}));
+ $('panel').innerHTML=`<h2>과학사 카드 ${S.log.length}/${B.length+U.length+SCI.length}</h2><div class="book">${sec('건물',bs)}${sec('업그레이드',us)}${sec('과학자',ss)}</div><div style="margin-top:14px"><button class="btn main" id="close">닫기</button></div>`;
+ $('modal').classList.add('show');$('close').onclick=()=>$('modal').classList.remove('show');
+}
+$('book').onclick=book;
+$('fab').onclick=e=>{$('orb').onclick(e);};
+new IntersectionObserver(es=>{for(const en of es)$('fab').classList.toggle('on',!en.isIntersecting);}).observe($('orb'));
+renderShop();setCount();tick(0);
 if(!S.t)howto();
 }
 </script>
