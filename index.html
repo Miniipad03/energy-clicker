@@ -105,7 +105,7 @@ blockquote small{display:block;color:var(--mute);margin-top:4px}
 .howto{margin:10px 0;padding-left:20px}
 .howto li{margin:4px 0}
 .foot{margin-top:24px;font-size:13px;color:var(--mute)}
-@media(max-width:600px){.stage{grid-template-columns:minmax(0,1fr)}.meters{grid-template-columns:repeat(2,minmax(0,1fr))}.mission{grid-template-columns:minmax(0,1fr) auto}.mission .ch{grid-column:1/-1}.vs{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){#toast{top:10px;bottom:auto;transform:translate(-50%,-150%);padding:10px 14px}#toast.show{transform:translate(-50%,0)}#toast p{font-size:14px}#orb{width:min(170px,46vw)}.fig{min-height:150px}.stage{grid-template-columns:minmax(0,1fr)}.meters{grid-template-columns:repeat(2,minmax(0,1fr))}.mission{grid-template-columns:minmax(0,1fr) auto}.mission .ch{grid-column:1/-1}.vs{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){#toast,#orb{transition:none}#visit,.float{animation:none}}
 </style>
 </head>
@@ -266,7 +266,7 @@ function sell(b){if(!S.own[b.id]||S.ch<3)return;S.own[b.id]--;S.work+=Math.floor
 function buyUp(u){if(S.ups[u.id]||S.work<u.cost)return;S.work-=u.cost;S.ups[u.id]=1;if(!S.snap)S.snap={use:use(),t:S.t};S.marks.push(S.hist.length);card(u);tick(0);}
 function card(x){if(S.seen[x.id])return;S.seen[x.id]=1;S.log.push({y:x.y,ct:x.ct});$('cards').textContent=S.log.length;show(x.y,x.n,x.ct,x.cx);}
 let tt=null;
-function show(y,k,t,p){const el=$('toast');el.innerHTML=`<div class="k"><span class="y">${y}</span><span>${k}</span></div><div class="t">${t}</div><p>${p}</p>`;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),7000);}
+function show(y,k,t,p){const el=$('toast');el.innerHTML=`<div class="k"><span class="y">${y}</span><span>${k}</span></div><div class="t">${t}</div><p>${p}</p>`;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),innerWidth<600?5000:7000);}
 $('toast').onclick=()=>{clearTimeout(tt);$('toast').classList.remove('show');};
 
 function eraName(){let e='근육의 시대';if(S.own.m||S.own.v)e='물과 바람의 시대';if(S.own.s)e='석탄의 시대';if(S.own.p)e='전기의 시대';if(S.own.o||S.own.t||S.own.n)e='새 에너지의 시대';if(S.own.d)e='AI의 시대';return e}
