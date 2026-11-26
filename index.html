@@ -59,6 +59,8 @@ h1{font-size:clamp(30px,6vw,46px)}
 #visit small{display:block;font-weight:400;font-size:12px;color:var(--mute)}
 @keyframes bob{to{transform:translateY(-6px)}}
 #boost{display:none;text-align:center;font-weight:900;color:var(--red)}
+#combo{font-size:13px;color:var(--mute);min-height:20px}
+#combo.hot{font-family:"Black Han Sans",sans-serif;font-size:18px;color:var(--red)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:18px 0 8px}
 .row h2{font-size:24px}
 .shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
@@ -147,6 +149,7 @@ blockquote small{display:block;color:var(--mute);margin-top:4px}
       </button>
       <div id="era">근육의 시대</div>
       <div class="sub">누르면 일 +<span id="perclick">1</span></div>
+      <div id="combo"></div>
       <div id="boost"></div>
     </div>
     <div class="chartbox">
@@ -163,7 +166,7 @@ blockquote small{display:block;color:var(--mute);margin-top:4px}
   <div class="row"><h2>건물</h2><span class="sub">모은 과학사 카드 <b id="cards">0</b>/<span id="cardsMax">0</span> · 같은 건물 10·25·50대마다 생산 ×2</span></div>
   <div id="shop"></div>
 
-  <div class="foot">HA1003 과학사와 과학커뮤니케이션 개인 프로젝트 · 권우성. 생산량과 기온은 게임을 위해 단순하게 만든 숫자이고, 과학사 카드 내용은 실제 기록입니다.</div>
+
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
@@ -187,6 +190,9 @@ const B=[
  {id:'k',n:'핵융합 KSTAR',ch:3,cost:300000000,inp:1500000,eff:1,ic:'k',y:'2024',ct:'한국의 인공태양',cx:'대전의 핵융합 장치 KSTAR는 2024년 1억 도 플라스마를 48초 동안 유지했습니다. 실제로는 아직 전기를 만들지 못하는 실험 장치예요. 클리어 후 보너스 건물입니다.'}
 ];
 const U=[
+ {id:'lever',n:'지렛대의 원리',t:[],x:2,kind:'click',cost:150,need:['w'],y:'기원전 3세기',ct:'아르키메데스',cx:'아르키메데스는 지렛대의 원리를 수학으로 정리했습니다. "설 자리를 주면 지구를 움직이겠다"는 말이 그의 것으로 전해집니다. 같은 힘으로 더 큰 일을 하는 첫걸음입니다.'},
+ {id:'hammer',n:'증기 해머',t:[],x:2,kind:'click',cost:20000,need:['s'],y:'1839',ct:'제임스 네이스미스',cx:'1839년 네이스미스가 증기의 힘으로 내리치는 해머를 설계했습니다. 거대한 쇳덩이를 두드리면서도 힘을 아주 섬세하게 조절할 수 있었습니다.'},
+ {id:'transistor',n:'트랜지스터',t:[],x:1.5,kind:'click',cost:2000000,need:['o','t'],y:'1947',ct:'벨 연구소',cx:'1947년 벨 연구소에서 트랜지스터가 나왔습니다. 작은 신호 하나로 큰 전류를 켜고 끄는 스위치로, 지금의 모든 컴퓨터 칩이 여기서 출발했습니다.'},
  {id:'smeaton',n:'스미턴의 물레바퀴 실험',t:['m','v'],x:2,cost:900,need:['m'],y:'1759',ct:'존 스미턴',cx:'스미턴은 물레바퀴와 풍차 날개를 모형으로 만들어 하나하나 재 봤습니다. 물이 바퀴 위로 떨어지게 하면 같은 물로 훨씬 많은 일을 한다는 걸 숫자로 보였습니다.'},
  {id:'watt',n:'와트의 분리 응축기',t:['s'],x:2,cost:6000,need:['s'],y:'1769',ct:'제임스 와트',cx:'와트가 분리 응축기를 달자 같은 일에 드는 석탄이 크게 줄었습니다. 그 뒤 영국은 석탄을 덜 썼을까요? 그래프를 보세요.'},
  {id:'turb',n:'파슨스 증기터빈',t:['p','n'],x:2,cost:60000,need:['p'],y:'1884',ct:'찰스 파슨스',cx:'피스톤 대신 날개를 빠르게 돌리는 증기터빈입니다. 지금도 화력·원자력 발전소 대부분이 이 방식으로 전기를 만듭니다.'},
@@ -214,7 +220,7 @@ const CH=[null,
  {hall:'Future of Humanity · 탄소 없이 AI 시대로',goals:[['AI 데이터센터 가동',()=>S.own.d>=1],['화석 시설 모두 폐쇄',()=>fossilCount()===0&&S.ch3seen,()=>`남은 ${fossilCount()}곳`]]}
 ];
 const fossilCount=()=>B.filter(b=>b.f).reduce((a,b)=>a+S.own[b.id],0);
-const KEY='energyClicker.v4';
+const KEY='energyClicker.v5';
 const fresh=()=>({work:0,own:Object.fromEntries(B.map(b=>[b.id,0])),ups:{},seen:{},log:[],hist:[],marks:[],snap:null,t:0,cum:0,ch:1,clickMul:1,ch3seen:0,won:0,winT:0,winTemp:0});
 let S=fresh();
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.own)S=Object.assign(fresh(),s)}catch(e){}
@@ -223,6 +229,8 @@ const $=id=>document.getElementById(id);
 const fmt=v=>{v=Math.floor(v);if(v<1e4)return v.toLocaleString('ko-KR');for(const[k,s]of[[1e12,'조'],[1e8,'억'],[1e4,'만']])if(v>=k)return(v/k).toFixed(v/k<10?1:0)+s;return v};
 const ms=id=>{const c=S.own[id];return(c>=10?2:1)*(c>=25?2:1)*(c>=50?2:1)};
 const mult=id=>ms(id)*U.filter(u=>S.ups[u.id]&&!u.kind&&u.t.includes(id)).reduce((a,u)=>a*u.x,1);
+const clickUp=()=>U.filter(u=>S.ups[u.id]&&u.kind==='click').reduce((a,u)=>a*u.x,1);
+let heat=0;const combo=()=>1+Math.min(heat,30)/20;
 const cmul=id=>U.filter(u=>S.ups[u.id]&&u.kind==='cost'&&u.t.includes(id)).reduce((a,u)=>a*u.x,1);
 const cost=b=>Math.ceil(b.cost*Math.pow(1.16,S.own[b.id])*cmul(b.id));
 const use=()=>B.reduce((a,b)=>a+S.own[b.id]*b.inp,0);
@@ -231,7 +239,7 @@ const temp=()=>S.cum/1.2e6;
 const pen=()=>{const t=temp();return t>=2?.6:t>=1.5?.8:1};
 const wps=()=>B.reduce((a,b)=>a+S.own[b.id]*b.inp*b.eff*mult(b.id),0)*pen()*boostX;
 const effGain=()=>U.filter(u=>S.ups[u.id]&&!u.kind).reduce((a,u)=>a*u.x,1);
-const perClick=()=>(1+Math.floor(wps()/boostX*0.03))*S.clickMul;
+const perClick=()=>Math.floor((2+wps()/boostX*0.02)*clickUp()*combo());
 const mmss=t=>{t=Math.floor(t);return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 
@@ -256,7 +264,7 @@ const hallOf=c=>['','문명','사회','미래'][c];
 const CHN=['','1 · Energy & Civilization','2 · Energy & Our Society','3 · Future of Humanity'];
 function renderShop(){
  $('shop').innerHTML=[1,2,3].map(c=>`<div class="grp" id="g-${c}"><div class="gh"><span>${CHN[c]}</span><span class="d" id="gl-${c}"></span></div><div class="shop">${B.filter(b=>b.ch===c).map(b=>`<div class="card locked" id="w-${b.id}"><button class="item" id="b-${b.id}"><span class="ico">${svg(b.ic)}</span><span><span class="n">${b.n}</span>${b.f?'<span class="fos">화석</span>':''}<br><span class="d" id="bd-${b.id}"></span></span><span class="c" id="bc-${b.id}"></span></button>${b.f?`<button class="close" id="sl-${b.id}" hidden></button>`:''}</div>`).join('')}</div></div>`).join('');
- $('ups').innerHTML=U.map(u=>`<div class="card uc locked" id="wu-${u.id}"><button class="item up" id="u-${u.id}"><span class="ico">${svg(B.find(b=>b.id===u.need[0]).ic)}</span><span><span class="n">${u.n}</span> <span class="yr">${u.y}</span><br><span class="d">${u.t.map(t=>B.find(b=>b.id===t).n).join('·')} ${u.kind==='cost'?'가격 ×'+u.x:'효율 ×'+u.x}</span></span><span class="c">${fmt(u.cost)}<small>일</small></span></button></div>`).join('');
+ $('ups').innerHTML=U.map(u=>`<div class="card uc locked" id="wu-${u.id}"><button class="item up" id="u-${u.id}"><span class="ico">${svg(B.find(b=>b.id===u.need[0]).ic)}</span><span><span class="n">${u.n}</span> <span class="yr">${u.y}</span><br><span class="d">${u.kind==='click'?'클릭 ×'+u.x:u.t.map(t=>B.find(b=>b.id===t).n).join('·')+' '+(u.kind==='cost'?'가격 ×'+u.x:'효율 ×'+u.x)}</span></span><span class="c">${fmt(u.cost)}<small>일</small></span></button></div>`).join('');
  B.forEach(b=>{$('b-'+b.id).onclick=()=>buy(b);if(b.f)$('sl-'+b.id).onclick=()=>sell(b);});
  U.forEach(u=>$('u-'+u.id).onclick=()=>buyUp(u));
  $('cardsMax').textContent=B.length+U.length+SCI.length;
@@ -279,9 +287,9 @@ function mission(){
  for(let i=1;i<=3;i++)$('st'+i).classList.toggle('on',S.ch>i);
 }
 function clearCh(){
- const c=S.ch;S.ch++;S.clickMul*=2;
- if(c===1)show('임무 1','완료','Energy & Civilization','증기기관이 공장을 돌리기 시작했습니다. 클릭 ×2. 이제 발전소와 자동차를 지을 수 있어요. 화석이냐 아니냐는 여러분이 고르세요.');
- if(c===2){S.ch3seen=1;show('임무 2','완료','Energy & Our Society','도시에 불이 들어왔습니다. 클릭 ×2. 마지막 임무는 화석 시설을 모두 닫고 AI 데이터센터를 돌리는 것. 화석 건물 카드 아래 "폐쇄" 버튼을 쓰세요.');}
+ const c=S.ch;S.ch++;
+ if(c===1)show('임무 1','완료','Energy & Civilization','증기기관이 공장을 돌리기 시작했습니다. 이제 발전소와 자동차를 지을 수 있어요. 화석이냐 아니냐는 여러분이 고르세요.');
+ if(c===2){S.ch3seen=1;show('임무 2','완료','Energy & Our Society','도시에 불이 들어왔습니다. 마지막 임무는 화석 시설을 모두 닫고 AI 데이터센터를 돌리는 것. 화석 건물 카드 아래 "폐쇄" 버튼을 쓰세요.');}
  if(c===3){S.won=1;S.winT=S.t;S.winTemp=temp();setTimeout(()=>result(true),600);}
  save();
 }
@@ -291,7 +299,7 @@ function tick(dt){
  $('work').textContent=fmt(S.work);$('wps').textContent=fmt(w);$('use').textContent=fmt(use());
  const t=temp();$('temp').textContent='+'+t.toFixed(2)+'°C';$('tbar').style.width=Math.min(100,t/2.5*100)+'%';
  $('pen').textContent=t>=2?'· 폭염: 생산 −40%':t>=1.5?'· 이상기후: 생산 −20%':'';
- $('perclick').textContent=fmt(perClick());$('era').textContent=eraName();
+ $('perclick').textContent=fmt(perClick());{const c=combo();$('combo').textContent=c>1.05?`연타 ×${c.toFixed(1)}`:'빠르게 연타하면 최대 ×2.5';$('combo').classList.toggle('hot',c>1.05);$('orb').style.filter=c>1.05?`brightness(${1+(c-1)*.25}) saturate(${1+(c-1)*.3})`:'';}$('era').textContent=eraName();
  $('clock').textContent=mmss(S.ch>3?S.winT:S.t);
  B.forEach(b=>{const wr=$('w-'+b.id),c=cost(b);const open=b.ch<=S.ch&&(S.work>=b.cost*.4||S.own[b.id]||b.id==='w');if(open||S.own[b.id])wr.classList.remove('locked');
   $('b-'+b.id).disabled=S.work<c||b.ch>S.ch;
@@ -305,7 +313,7 @@ function tick(dt){
  $('upsEmpty').hidden=U.some(u=>!S.ups[u.id]&&u.need.some(n=>S.own[n]));
  mission();
 }
-$('orb').onclick=e=>{const v=perClick();S.work+=v;tick(0);
+$('orb').onclick=e=>{heat=Math.min(heat+1,40);const v=perClick();S.work+=v;tick(0);
  const f=document.createElement('span');f.className='float';f.textContent='+'+fmt(v);const r=$('orbbox').getBoundingClientRect();
  f.style.left=((e.clientX||r.left+r.width/2)-r.left-10)+'px';f.style.top=((e.clientY||r.top+r.height/2)-r.top-20)+'px';$('orbbox').appendChild(f);setTimeout(()=>f.remove(),800);};
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();$('orb').click();}});
@@ -336,7 +344,7 @@ function draw(){const W=cv.clientWidth,H=cv.clientHeight,dpr=devicePixelRatio||1
 const ro=new ResizeObserver(draw);ro.observe(cv);
 
 let last=performance.now(),acc=0,sv=0;
-function loop(now){const real=Math.min(.25,(now-last)/1000),dt=real*speed;last=now;S.t+=dt;
+function loop(now){const real=Math.min(.25,(now-last)/1000),dt=real*speed;last=now;S.t+=dt;heat=Math.max(0,heat-real*8);
  if(boostT>0){boostT-=dt;$('boost').style.display='block';$('boost').textContent=`생산 ×5 · ${Math.ceil(boostT)}초`;if(boostT<=0){boostX=1;$('boost').style.display='none';}}
  nextVisit-=dt;if(nextVisit<=0&&S.t>20){spawnVisit();nextVisit=30+Math.random()*25;}
  if(visitLeft>0){visitLeft-=real;if(visitLeft<=0)$('visit').style.display='none';}
@@ -370,7 +378,8 @@ function howto(){
  <li>위의 임무 세 개를 순서대로 깹니다. 나주 에너지과학관의 세 전시관과 같은 순서예요.</li>
  <li>효율 업그레이드를 사고 나서 그래프의 에너지 사용량이 어떻게 변하는지 보세요.</li>
  <li>화석 건물은 탄소를 내고, 쌓이면 기온이 오릅니다. +1.5°C를 넘으면 생산이 줄어요.</li>
- <li>과학자가 화면에 나타나면 눌러 보세요. 보너스와 카드를 줍니다.</li></ol>
+ <li>과학자가 화면에 나타나면 눌러 보세요. 보너스와 카드를 줍니다.</li>
+ <li>불씨를 빠르게 연타하면 한 번에 얻는 일이 최대 2.5배까지 늘어납니다.</li></ol>
  <p class="sub">보통 5~10분 걸립니다. 클리어 시간을 친구와 비교해 보세요.</p>
  <button class="btn main" id="close">시작</button>`;
  $('modal').classList.add('show');$('close').onclick=()=>$('modal').classList.remove('show');
