@@ -218,6 +218,14 @@ const U=[
  {id:'chip',n:'AI 칩 효율',t:['d'],x:3,cost:200000000,need:['d'],y:'미래',ct:'계산 효율',cx:'칩 하나가 같은 전기로 세 배를 계산합니다. 사람들은 그만큼 계산을 덜 하게 될까요?'}
 ];
 const SCI=[
+ {n:'헤론',y:'1세기',x:'알렉산드리아의 헤론은 증기가 뿜어져 나오며 공이 빙글빙글 도는 장치를 기록했습니다. 증기의 힘을 쓴 가장 오래된 기록 중 하나지만 장난감으로 끝났습니다.'},
+ {n:'갈바니',y:'1791',x:'개구리 다리에 금속을 대자 근육이 움찔하는 걸 보고 생물 안에 전기가 있다고 발표했습니다. 이 논쟁이 볼타의 전지로 이어졌습니다.'},
+ {n:'외르스테드',y:'1820',x:'강의 도중 전선에 전류를 흘리자 옆에 있던 나침반 바늘이 움직였습니다. 전기와 자기가 연결돼 있다는 첫 증거였습니다.'},
+ {n:'베크렐',y:'1839',x:'열아홉 살의 에드몽 베크렐이 빛을 받으면 전기가 생기는 광기전 효과를 발견했습니다. 태양전지의 출발점입니다.'},
+ {n:'맥스웰',y:'1865',x:'전기와 자기, 빛을 하나의 방정식으로 묶었습니다. 빛이 전자기파라는 걸 보인 해가 제번스의 『석탄 문제』와 같은 1865년입니다.'},
+ {n:'에디슨',y:'1879',x:'오래 켜지는 백열전구를 시연했습니다. 전구를 팔려면 전기가 필요했고, 그래서 3년 뒤 펄 스트리트 발전소를 열었습니다.'},
+ {n:'디젤',y:'1893',x:'불꽃 없이 공기를 세게 압축해서 연료를 태우는 엔진으로 특허를 받았습니다. 지금도 트럭과 배 대부분이 이 방식입니다.'},
+ {n:'페르미',y:'1942',x:'시카고 대학 운동장 관중석 아래에서 사람이 만든 첫 핵분열 연쇄반응을 일으켰습니다. 원자로의 시작입니다.'},
  {n:'카르노',y:'1824',x:'열기관이 낼 수 있는 효율에 넘을 수 없는 한계가 있다는 걸 처음 보였습니다.'},
  {n:'볼타',y:'1800',x:'아연과 구리를 번갈아 쌓아 최초의 전지, 볼타 전퇴를 만들었습니다.'},
  {n:'패러데이',y:'1831',x:'자석을 움직이면 전기가 생기는 전자기 유도를 발견했습니다. 지금 쓰는 발전기는 전부 이 원리입니다.'},
@@ -228,13 +236,20 @@ const SCI=[
  {n:'아인슈타인',y:'1905',x:'E=mc². 아주 작은 질량에도 엄청난 에너지가 들어 있다는 식을 발표했습니다.'},
  {n:'리제 마이트너',y:'1939',x:'조카 프리슈와 함께, 우라늄 핵이 둘로 쪼개지는 핵분열을 처음 물리적으로 설명했습니다.'}
 ];
+const CLI=[
+ {id:'foote',at:-1,n:'유니스 푸트',y:'1856',ct:'유리병 속 이산화탄소',cx:'푸트는 유리병에 이산화탄소와 공기를 각각 넣고 햇볕에 두었습니다. 이산화탄소를 넣은 병이 더 뜨거워졌고, 이런 기체가 많으면 지구도 더 따뜻해질 거라고 적었습니다.'},
+ {id:'arrh',at:.5,n:'스반테 아레니우스',y:'1896',ct:'첫 계산',cx:'아레니우스는 대기 중 이산화탄소가 두 배가 되면 지구 기온이 몇 도 오를지를 손으로 계산했습니다. 석탄을 태우는 것과 기후를 처음으로 숫자로 이었습니다.'},
+ {id:'keeling',at:1,n:'찰스 킬링',y:'1958',ct:'킬링 곡선',cx:'킬링은 하와이 마우나로아 산에서 대기 중 이산화탄소를 매일 재기 시작했습니다. 그래프는 해마다 오르내리면서도 계속 위로 올라갔고, 측정은 지금도 이어지고 있습니다.'},
+ {id:'manabe',at:1.5,n:'마나베 슈쿠로',y:'1967',ct:'기후 모델',cx:'마나베는 컴퓨터로 대기를 계산하는 기후 모델을 만들어 이산화탄소가 늘면 기온이 오른다는 걸 보였습니다. 2021년 노벨 물리학상을 받았습니다. 여기서부터 게임 속 생산도 줄어듭니다.'}
+];
+function climate(){const t=temp(),fo=B.some(b=>b.f&&S.own[b.id]);for(const c of CLI){if(S.seen[c.id])continue;if((c.at<0&&fo)||(c.at>=0&&t>=c.at)){S.seen[c.id]=1;S.log.push({y:c.y,ct:c.n});setCount();show(c.y,c.n,c.ct,c.cx);break;}}}
 const CH=[null,
  {hall:'Energy & Civilization · 석탄으로 산업혁명',goals:[['석탄 증기기관 10대',()=>S.own.s>=10,()=>`${Math.min(S.own.s,10)}/10`],['와트의 분리 응축기',()=>!!S.ups.watt]]},
  {hall:'Energy & Our Society · 도시에 전기 들이기',goals:[['발전소 10곳 (화력+수력)',()=>S.own.p+S.own.h>=10,()=>`${Math.min(S.own.p+S.own.h,10)}/10`],['자동차 10대 (가솔린+전기)',()=>S.own.g+S.own.e>=10,()=>`${Math.min(S.own.g+S.own.e,10)}/10`],['청색 LED',()=>!!S.ups.led]]},
  {hall:'Future of Humanity · 탄소 없이 AI 시대로',goals:[['AI 데이터센터 가동',()=>S.own.d>=1],['화석 시설 모두 폐쇄',()=>fossilCount()===0&&S.ch3seen,()=>`남은 ${fossilCount()}곳`]]}
 ];
 const fossilCount=()=>B.filter(b=>b.f).reduce((a,b)=>a+S.own[b.id],0);
-const KEY='energyClicker.v5';
+const KEY='energyClicker.v6';
 const fresh=()=>({work:0,own:Object.fromEntries(B.map(b=>[b.id,0])),ups:{},seen:{},log:[],hist:[],marks:[],snap:null,t:0,cum:0,ch:1,clickMul:1,ch3seen:0,won:0,winT:0,winTemp:0});
 let S=fresh();
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.own)S=Object.assign(fresh(),s)}catch(e){}
@@ -281,7 +296,7 @@ function renderShop(){
  $('ups').innerHTML=U.map(u=>`<div class="card uc locked" id="wu-${u.id}"><button class="item up" id="u-${u.id}"><span class="ico">${svg(B.find(b=>b.id===u.need[0]).ic)}</span><span><span class="n">${u.n}</span> <span class="yr">${u.y}</span><br><span class="d">${u.kind==='click'?'클릭 ×'+u.x:u.t.map(t=>B.find(b=>b.id===t).n).join('·')+' '+(u.kind==='cost'?'가격 ×'+u.x:'효율 ×'+u.x)}</span></span><span class="c">${fmt(u.cost)}<small>일</small></span></button></div>`).join('');
  B.forEach(b=>{$('b-'+b.id).onclick=()=>buy(b);if(b.f)$('sl-'+b.id).onclick=()=>sell(b);});
  U.forEach(u=>$('u-'+u.id).onclick=()=>buyUp(u));
- $('cardsMax').textContent=B.length+U.length+SCI.length;
+ $('cardsMax').textContent=B.length+U.length+SCI.length+CLI.length;
 }
 function buy(b){if(b.ch>S.ch)return;const c=cost(b);if(S.work<c)return;S.work-=c;S.own[b.id]++;card(b);tick(0);}
 function sell(b){if(!S.own[b.id]||S.ch<3)return;S.own[b.id]--;S.work+=Math.floor(cost(b)*.5);tick(0);}
@@ -361,10 +376,10 @@ const ro=new ResizeObserver(draw);ro.observe(cv);
 let last=performance.now(),acc=0,sv=0;
 function loop(now){const real=Math.min(.25,(now-last)/1000),dt=real*speed;last=now;S.t+=dt;heat=Math.max(0,heat-real*8);
  if(boostT>0){boostT-=dt;$('boost').style.display='block';$('boost').textContent=`생산 ×5 · ${Math.ceil(boostT)}초`;if(boostT<=0){boostX=1;$('boost').style.display='none';}}
- nextVisit-=dt;if(nextVisit<=0&&S.t>20){spawnVisit();nextVisit=30+Math.random()*25;}
+ nextVisit-=dt;if(nextVisit<=0&&S.t>20){spawnVisit();nextVisit=25+Math.random()*20;}
  if(visitLeft>0){visitLeft-=real;if(visitLeft<=0)$('visit').style.display='none';}
  tick(dt);acc+=real;sv+=real;
- if(acc>=.5){acc=0;S.hist.push([use(),emis()]);if(S.hist.length>300){S.hist.shift();S.marks=S.marks.map(i=>i-1);}draw();}
+ if(acc>=.5){acc=0;climate();S.hist.push([use(),emis()]);if(S.hist.length>300){S.hist.shift();S.marks=S.marks.map(i=>i-1);}draw();}
  if(sv>=5){sv=0;save();}
  requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
@@ -380,7 +395,7 @@ function result(win){
  <blockquote>“It is wholly a confusion of ideas to suppose that the economical use of fuel is equivalent to a diminished consumption. The very contrary is the truth.”<small>연료를 아껴 쓰면 소비가 줄 거라는 생각은 완전히 헷갈린 것이다. 사실은 정반대다. (W. S. Jevons, <i>The Coal Question</i>, 1865)</small></blockquote>
  <p>${win?'효율 업그레이드를 살 때마다 에너지 사용은 늘었고 탄소 배출을 0으로 만든 건 화석 시설을 닫고 에너지원을 바꾼 일이었습니다.':'임무 3까지 가면 탄소 배출을 0으로 만든 게 무엇인지 그래프로 볼 수 있어요.'}</p>
  <p class="sub">현실에서 이 효과(반동 효과)가 얼마나 큰지는 분야마다 다르고 아직 논쟁 중입니다. 게임 속 숫자는 단순화한 값입니다.</p>
- <h3>모은 카드 ${S.log.length}/${B.length+U.length+SCI.length}</h3><div class="log">${S.log.map(x=>`<div><b>${x.y}</b> ${x.ct}</div>`).join('')}</div>
+ <h3>모은 카드 ${S.log.length}/${B.length+U.length+SCI.length+CLI.length}</h3><div class="log">${S.log.map(x=>`<div><b>${x.y}</b> ${x.ct}</div>`).join('')}</div>
  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><button class="btn main" id="close">계속하기</button><button class="btn" id="reset">처음부터</button></div>`;
  $('modal').classList.add('show');
  $('close').onclick=()=>$('modal').classList.remove('show');
@@ -405,7 +420,8 @@ function book(){
  const bs=B.map(b=>({got:S.seen[b.id],y:b.y,n:b.n,t:b.ct,x:b.cx,h:b.ch>S.ch?`임무 ${b.ch}에서 열리는 건물`:'아직 안 지은 건물'}));
  const us=U.map(u=>({got:S.seen[u.id],y:u.y,n:u.n,t:u.ct,x:u.cx,h:'아직 안 산 업그레이드'}));
  const ss=SCI.map(c=>({got:S.seen['sci-'+c.n],y:c.y,n:c.n,t:'과학자 방문',x:c.x,h:'화면에 나타나는 과학자를 눌러 보세요'}));
- $('panel').innerHTML=`<h2>과학사 카드 ${S.log.length}/${B.length+U.length+SCI.length}</h2><div class="book">${sec('건물',bs)}${sec('업그레이드',us)}${sec('과학자',ss)}</div><div style="margin-top:14px"><button class="btn main" id="close">닫기</button></div>`;
+ const cs=CLI.map(c=>({got:S.seen[c.id],y:c.y,n:c.n,t:c.ct,x:c.cx,h:c.at<0?'화석 시설을 처음 지으면 나타납니다':`기온이 +${c.at}°C를 넘으면 나타납니다`}));
+ $('panel').innerHTML=`<h2>과학사 카드 ${S.log.length}/${B.length+U.length+SCI.length+CLI.length}</h2><div class="book">${sec('건물',bs)}${sec('업그레이드',us)}${sec('과학자',ss)}${sec('기후',cs)}</div><div style="margin-top:14px"><button class="btn main" id="close">닫기</button></div>`;
  $('modal').classList.add('show');$('close').onclick=()=>$('modal').classList.remove('show');
 }
 $('book').onclick=book;
