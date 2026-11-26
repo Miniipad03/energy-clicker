@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="dark">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Energy Clicker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +14,7 @@
    COLOUR/TYPE: 햇빛 노랑, 그을음 검정, 불꽃 빨강 / Black Han Sans + Noto Sans KR
    LAYOUT: 임무 → 계기판 → 버튼+그래프 → 업그레이드 → 건물. 600px 이하 1열 */
 :root{color-scheme:light dark;--bg:light-dark(#ffcf33,#17140f);--card:light-dark(#fff6d6,#262119);--ink:light-dark(#17140f,#fff1c7);--mute:light-dark(#5b4a1c,#c9b98a);--red:#e8432e;--line:light-dark(#17140f,#fff1c7);--ok:light-dark(#1f6b3a,#7ee0a0);--blue:light-dark(#1d4fa0,#8fb8ff)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+:root,:root[data-theme=light],:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Noto Sans KR",system-ui,sans-serif;overflow-x:clip;-webkit-tap-highlight-color:transparent}
 h1,h2,.bh{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-weight:400;line-height:1.05;margin:0}
